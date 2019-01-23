@@ -1,5 +1,6 @@
 package com.example.axu1.richarddawkinsalarmclock;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -14,10 +15,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import java.util.Calendar;
 
 import com.example.axu1.richarddawkinsalarmclock.util.PreferenceUtil;
 
-import java.util.Calendar;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements AccelerometerListener {
@@ -31,12 +32,13 @@ public class MainActivity extends AppCompatActivity implements AccelerometerList
     private TextView countTextView;
 
     private AlarmReceiver alarm;
-    PreferenceUtil pref;
+
     private Integer shakeCount;
 
 
     MainActivity inst;
     Context context;
+    PreferenceUtil pref;
 
     @Override
     protected void onResume() {
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements AccelerometerList
         Toast.makeText(this, shakeCount.toString() + "回", Toast.LENGTH_SHORT).show();
 
 
-        if(shakeCount >= 10) {
+        if (shakeCount >= 10) {
 
             //------------------
             this.context = this;
@@ -104,8 +106,6 @@ public class MainActivity extends AppCompatActivity implements AccelerometerList
     }
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,8 +118,7 @@ public class MainActivity extends AppCompatActivity implements AccelerometerList
                 startActivity(intent);
             }
         });
-        pref = new PreferenceUtil(this);//20190121↓
-        //20190121↑
+
         this.context = this;
         final Intent myIntent = new Intent(this.context, AlarmReceiver.class);
         shakeCount = 0;
@@ -127,7 +126,6 @@ public class MainActivity extends AppCompatActivity implements AccelerometerList
 
         //alarm = new AlarmReceiver();
         alarmTextView = (TextView) findViewById(R.id.alarmText);
-
 
 
         // Get the alarm manager service
@@ -139,44 +137,43 @@ public class MainActivity extends AppCompatActivity implements AccelerometerList
         alarmTimePicker = (TimePicker) findViewById(R.id.alarmTimePicker);
 
 
-            Button start_alarm = (Button) findViewById(R.id.start_alarm);
-            start_alarm.setOnClickListener(new View.OnClickListener() {
-                @TargetApi(Build.VERSION_CODES.M)
+        Button start_alarm = (Button) findViewById(R.id.start_alarm);
+        start_alarm.setOnClickListener(new View.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.M)
 
-                @Override
-                public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
 
-                    calendar.add(Calendar.SECOND, 3);
-                    //setAlarmText("You clicked a button");
+                calendar.add(Calendar.SECOND, 3);
+                //setAlarmText("You clicked a button");
 
-                    final int hour = alarmTimePicker.getCurrentHour();
-                    final int minute = alarmTimePicker.getCurrentMinute();
-                    ;
+                final int hour = alarmTimePicker.getCurrentHour();
+                final int minute = alarmTimePicker.getCurrentMinute();
 
-                    Log.e("MyActivity", "In the receiver with " + hour + " and " + minute);
-                    setAlarmText("You clicked a " + hour + " and " + minute);
-
-
-                    calendar.set(Calendar.HOUR_OF_DAY, alarmTimePicker.getCurrentHour());
-                    calendar.set(Calendar.MINUTE, alarmTimePicker.getCurrentMinute());
-
-                    myIntent.putExtra("extra", "yes");
-                    pending_intent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending_intent);
+                Log.e("MyActivity", "In the receiver with " + hour + " and " + minute);
+                setAlarmText("You clicked a " + hour + " and " + minute);
 
 
-                    // now you should change the set Alarm text so it says something nice
+                calendar.set(Calendar.HOUR_OF_DAY, alarmTimePicker.getCurrentHour());
+                calendar.set(Calendar.MINUTE, alarmTimePicker.getCurrentMinute());
+
+                myIntent.putExtra("extra", "yes");
+                pending_intent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending_intent);
 
 
-                    setAlarmText(hour + ":" + minute + "のアラームをセットしました");
-                    //Toast.makeText(getApplicationContext(), "You set the alarm", Toast.LENGTH_SHORT).show();
-                }
-
-            });
+                // now you should change the set Alarm text so it says something nice
 
 
-        Button stop_alarm= (Button) findViewById(R.id.stop_alarm);
+                setAlarmText(hour + ":" + minute + "のアラームをセットしました");
+                //Toast.makeText(getApplicationContext(), "You set the alarm", Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+
+        Button stop_alarm = (Button) findViewById(R.id.stop_alarm);
         stop_alarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -199,14 +196,13 @@ public class MainActivity extends AppCompatActivity implements AccelerometerList
 
     }
 
-    private void stopAlarm(){
+    private void stopAlarm() {
 
     }
 
     public void setAlarmText(String alarmText) {
         alarmTextView.setText(alarmText);
     }
-
 
 
     @Override
@@ -228,5 +224,32 @@ public class MainActivity extends AppCompatActivity implements AccelerometerList
         Log.e("MyActivity", "on Destroy");
     }
 
+    // 登録
+    @SuppressLint("ObsoleteSdkInt")
+    private void register(long alarmTimeMillis) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent = getPendingIntent();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(alarmTimeMillis, null), pendingIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmTimeMillis, pendingIntent);
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTimeMillis, pendingIntent);
+        }
+        // 保存
+        pref.setLong(ALARM_TIME, alarmTimeMillis);
+    }
+
+    // 解除
+    private void unregister() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(getPendingIntent());
+        pref.delete(ALARM_TIME);
+    }
+    private PendingIntent getPendingIntent() {
+        Intent intent = new Intent(this, com.example.axu1.richarddawkinsalarmclock.AlarmCheckActivity.class);
+        intent.setClass(this, com.example.axu1.richarddawkinsalarmclock.AlarmCheckActivity.class);
+        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+    }
 
 }

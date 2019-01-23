@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.axu1.richarddawkinsalarmclock">
+
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher_round"
+        android:label="目覚ましアラーム"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".PlaySoundActivity"/>
+        <activity
+            android:name=".MainActivity"
+            android:label="目覚ましアラーム">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
+        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".AlarmCheckActivity"
+            android:process=":remote" />
+        <service android:name=".RingtonePlayingService"
+            android:enabled="true">
+        </service>
+        <service android:name=".PlaySoundService"
+            android:enabled="true"
+            android:exported="false"/>
+        <activity
+            android:name=".SubActivity"
+            android:label="目覚ましアラーム" >
+        </activity>
+
+    </application>
+
+</manifest>
